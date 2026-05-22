@@ -4,13 +4,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 
 const route = useRoute()
-const title = computed(() => {
-  const map = { '/tasks': '任务管理', '/data': '数据查看' }
+const title = computed<string>(() => {
+  const map: Record<string, string> = { '/tasks': '任务管理', '/data': '数据查看' }
   return map[route.path] || ''
 })
 </script>

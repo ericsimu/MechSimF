@@ -10,9 +10,9 @@
   </div>
 </template>
 
-<script setup>
-defineProps({ title: String, expanded: Boolean })
-defineEmits(['toggle'])
+<script setup lang="ts">
+defineProps<{ title: string; expanded: boolean }>()
+defineEmits<{ toggle: [] }>()
 </script>
 
 <style scoped>

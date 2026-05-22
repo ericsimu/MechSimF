@@ -1,9 +1,11 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { bootstrap } from '@aurora-design/vue'
+import '@aurora-design/vue/dist/global.css'
 import App from './App.vue'
 import './style.css'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/cases' },
   {
     path: '/cases',
@@ -13,7 +15,7 @@ const routes = [
   {
     path: '/tasks',
     name: 'Tasks',
-    component: () => import('./views/Placeholder.vue'),
+    component: () => import('./views/Tasks.vue'),
   },
   {
     path: '/data',
@@ -27,4 +29,12 @@ const router = createRouter({
   routes,
 })
 
-createApp(App).use(router).mount('#app')
+bootstrap({
+  autoLoaded: true,
+  autoLoadedDelay: 300,
+}, async () => {
+  const app = createApp(App)
+  app.use(router)
+  app.mount('#aurora')
+  return '#aurora'
+})
