@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import type {
   ApiResponse, CaseModel, SimTask, AddCaseRequest, UpdateCaseRequest,
-  CaseShare, DiffRow, DisturbanceInfo, ModelInfoMap, DisturbanceDirNode,
+  CaseShare, DiffRow, DisturbanceInfo, ModelInfoMap, DisturbanceDirNode, DisturbanceColumn,
 } from '../types/api'
 
 const BASE = '/api/v1/sim'
@@ -18,7 +18,7 @@ export function closeError(): void {
 }
 
 export function getCurrentUser(): string {
-  return localStorage.getItem('current_user') || 'yahang.yao'
+  return localStorage.getItem('current_user') || 'user1'
 }
 
 export function setCurrentUser(name: string): void {
@@ -100,8 +100,8 @@ export function diffCase(id: number, body: UpdateCaseRequest): Promise<ApiRespon
   return request<DiffRow[]>(`/diff_case/${id}`, { method: 'POST', body: JSON.stringify(body) })
 }
 
-export function addTasks(caseId: number): Promise<ApiResponse<{ task_ids: number[] }>> {
-  return request('/add_tasks', { method: 'POST', body: JSON.stringify({ case_id: caseId }) })
+export function addTasks(caseId: number, paramDiff?: string): Promise<ApiResponse<{ task_ids: number[] }>> {
+  return request('/add_tasks', { method: 'POST', body: JSON.stringify({ case_id: caseId, param_diff: paramDiff || '' }) })
 }
 
 export function queueTasks(): Promise<ApiResponse<SimTask[]>> {
@@ -110,4 +110,26 @@ export function queueTasks(): Promise<ApiResponse<SimTask[]>> {
 
 export function runTasks(taskIds: number[]): Promise<ApiResponse<{ submitted: number[] }>> {
   return request('/run_tasks', { method: 'POST', body: JSON.stringify({ task_ids: taskIds }) })
+}
+
+export function deleteTask(id: number): Promise<ApiResponse> {
+  return request(`/delete_task/${id}`, { method: 'DELETE' })
+}
+
+export function getTaskData(taskId: number): Promise<ApiResponse<{ columns: DisturbanceColumn[]; fft_columns?: DisturbanceColumn[]; task_status: string }>> {
+  return request(`/task_data/${taskId}`)
+}
+
+export function getTaskDataColumns(taskId: number): Promise<ApiResponse<{ column_names: string[]; fft_column_names?: string[]; task_status: string }>> {
+  return request(`/task_data/${taskId}?names_only=true`)
+}
+
+export function getTaskSignals(taskId: number, signalNames: string[], domain: string, start?: number, end?: number, raw?: boolean): Promise<ApiResponse<{ columns: DisturbanceColumn[] }>> {
+  const body: Record<string, unknown> = { signal_names: signalNames, domain }
+  if (start != null && end != null) { body.start = start; body.end = end }
+  if (raw) { body.raw = true }
+  return request(`/task_data/${taskId}/signals`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
 }

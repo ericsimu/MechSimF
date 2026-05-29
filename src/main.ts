@@ -18,9 +18,9 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/Tasks.vue'),
   },
   {
-    path: '/data',
+    path: '/data/:taskId?',
     name: 'Data',
-    component: () => import('./views/Placeholder.vue'),
+    component: () => import('./views/DataViewer.vue'),
   },
 ]
 

@@ -3,15 +3,28 @@
     <aside class="sidebar">
       <div class="sidebar-brand">MechSim</div>
       <nav class="sidebar-nav">
-        <router-link
-          v-for="item in navItems"
-          :key="item.path"
-          :to="item.path"
-          class="nav-item"
-          active-class="active"
-        >
-          {{ item.label }}
-        </router-link>
+        <template v-for="item in navItems" :key="item.label">
+          <a
+            v-if="item.path"
+            :class="['nav-item', { active: isActive(item.path) }]"
+            @click="goTo(item.path)"
+          >
+            {{ item.label }}
+          </a>
+          <div v-else class="nav-group">
+            <div class="nav-parent">{{ item.label }}</div>
+            <div class="nav-sub">
+              <a
+                v-for="sub in item.children"
+                :key="sub.label"
+                :class="['nav-sub-item', { active: isActive(sub.path) }]"
+                @click="goTo(sub.path)"
+              >
+                {{ sub.label }}
+              </a>
+            </div>
+          </div>
+        </template>
       </nav>
     </aside>
     <div class="app-body">
@@ -43,15 +56,36 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter, useRoute } from 'vue-router'
 import { errorState, closeError } from './api/index'
 
-interface NavItem { path: string; label: string }
+interface NavChild { path: string; label: string }
+interface NavItem { path?: string; label: string; children?: NavChild[] }
+
+const router = useRouter()
+const route = useRoute()
 
 const navItems: NavItem[] = [
   { path: '/cases', label: '用例编排' },
   { path: '/tasks', label: '任务管理' },
-  { path: '/data', label: '数据查看' },
+  {
+    label: '结果分析',
+    children: [
+      { path: '/data', label: '数据可视化' },
+      { path: '/data', label: '指标查看' },
+      { path: '/data', label: '报告查看' },
+      { path: '/data', label: '日志查看' },
+    ],
+  },
 ]
+
+function isActive(path: string): boolean {
+  return route.path === path || route.path.startsWith(path + '/')
+}
+
+function goTo(path: string) {
+  router.push(path)
+}
 </script>
 
 <style scoped>
@@ -81,6 +115,7 @@ const navItems: NavItem[] = [
   color: rgba(255,255,255,0.85);
   text-decoration: none;
   font-size: 14px;
+  cursor: pointer;
   transition: color 0.15s, background 0.15s;
 }
 
@@ -92,6 +127,28 @@ const navItems: NavItem[] = [
   border: 1px solid rgba(255,255,255,0.5);
   border-radius: 4px;
 }
+
+.nav-parent {
+  padding: 12px 20px 4px;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+}
+
+.nav-sub { padding: 0 0 8px; }
+
+.nav-sub-item {
+  display: block;
+  padding: 8px 20px 8px 40px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-sub-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+.nav-sub-item.active { color: #fff; font-weight: 500; }
 
 .app-body {
   flex: 1;

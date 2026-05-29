@@ -1,54 +1,69 @@
 <template>
   <div class="case-page">
-    <div class="split-container">
-      <!-- Case list (always visible, fills space when no edit panel) -->
-      <div class="case-list" :style="editCase ? { height: (splitRatio * 100) + '%', overflow: 'auto' } : {}">
-        <div class="page-header">
-          <h2>用例列表</h2>
-          <AuroraButton class="btn-outline" @click="modalOpen = true">创建用例</AuroraButton>
+    <div class="case-layout">
+      <!-- Left: Case Navigation Sidebar -->
+      <div class="case-sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">用例列表</span>
+          <AuroraButton class="btn-outline btn-create" @click="modalOpen = true">新建</AuroraButton>
         </div>
-        <table v-if="!loading">
-          <thead>
-            <tr><th>名称</th><th>描述</th><th>创建者</th><th>创建时间</th><th>操作</th></tr>
-          </thead>
-          <tbody>
-            <tr v-if="cases.length === 0"><td colspan="5" class="empty">暂无数据</td></tr>
-            <tr v-for="c in cases" :key="c.id" :class="{ 'row-selected': editCase?.id === c.id }">
-              <td>
-                <input v-if="editing.id===c.id && editing.field==='name'" v-model="editValue" class="inline-input"
-                  @blur="saveInline(c,'name')" @keydown.enter="saveInline(c,'name')" @keydown.escape="cancelInline" />
-                <span v-else class="editable-cell" @click="startInline(c,'name')">{{ c.name || '-' }}</span>
-              </td>
-              <td>
-                <input v-if="editing.id===c.id && editing.field==='description'" v-model="editValue" class="inline-input"
-                  @blur="saveInline(c,'description')" @keydown.enter="saveInline(c,'description')" @keydown.escape="cancelInline" />
-                <span v-else class="editable-cell" @click="startInline(c,'description')">{{ c.description || '-' }}</span>
-              </td>
-              <td>{{ c.create_by }}</td>
-              <td>{{ c.create_time ? new Date(c.create_time).toLocaleString() : '-' }}</td>
-              <td><div class="actions-cell">
-                <AuroraButton class="btn-outline" size="mini" @click="openEdit(c)">编辑</AuroraButton>
-                <AuroraButton class="btn-outline" size="mini" @click="handleCopy(c)">复制</AuroraButton>
-                <AuroraButton class="btn-outline" size="mini" @click="openShare(c)">共享</AuroraButton>
-                <AuroraButton class="btn-outline" size="mini" @click="confirmDelete(c)">删除</AuroraButton>
-              </div></td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-else class="loading">加载中...</div>
+        <div v-if="loading" class="sidebar-loading">加载中...</div>
+        <div v-else-if="cases.length === 0" class="sidebar-empty">暂无用例</div>
+        <ul v-else class="sidebar-list">
+          <li v-for="c in cases" :key="c.id"
+            :class="['sidebar-item', { 'sidebar-item-active': editCase?.id === c.id }]"
+            @click="openEdit(c)">
+            <span class="sidebar-item-text">{{ c.name || '未命名' }}</span>
+          </li>
+        </ul>
       </div>
 
-      <template v-if="editCase">
-        <div class="resize-handle" @mousedown="startResize" :class="{ dragging: isResizing }"></div>
-
-        <div class="edit-panel">
-          <div class="edit-toolbar">
-            <h3>{{ editCase.name }}</h3>
-            <div class="toolbar-actions">
-              <AuroraButton class="btn-outline" size="small" @click="openTaskModal">创建任务</AuroraButton>
-              <AuroraButton class="btn-outline" size="small" :load="saving" @click="handleSave">保存</AuroraButton>
+      <!-- Right: Main Content (table + edit panel) -->
+      <div class="case-main">
+        <div class="split-container">
+          <!-- Case detail — single row for selected case -->
+          <div class="case-list">
+            <div class="page-header">
+              <h2>用例详情</h2>
             </div>
+            <table>
+              <thead>
+                <tr><th>名称</th><th>描述</th><th>创建者</th><th>创建时间</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                <tr v-if="editCase">
+                  <td>
+                    <input v-if="editing.id===editCase.id && editing.field==='name'" v-model="editValue" class="inline-input"
+                      @blur="saveInline(editCase,'name')" @keydown.enter="saveInline(editCase,'name')" @keydown.escape="cancelInline" />
+                    <span v-else class="editable-cell" @click="startInline(editCase,'name')">{{ editCase.name || '-' }}</span>
+                  </td>
+                  <td>
+                    <input v-if="editing.id===editCase.id && editing.field==='description'" v-model="editValue" class="inline-input"
+                      @blur="saveInline(editCase,'description')" @keydown.enter="saveInline(editCase,'description')" @keydown.escape="cancelInline" />
+                    <span v-else class="editable-cell" @click="startInline(editCase,'description')">{{ editCase.description || '-' }}</span>
+                  </td>
+                  <td>{{ editCase.create_by }}</td>
+                  <td>{{ editCase.create_time ? new Date(editCase.create_time).toLocaleString() : '-' }}</td>
+                  <td><div class="actions-cell">
+                    <AuroraButton class="btn-outline" size="mini" @click="handleCopy(editCase)">复制</AuroraButton>
+                    <AuroraButton class="btn-outline" size="mini" @click="openShare(editCase)">共享</AuroraButton>
+                    <AuroraButton class="btn-outline" size="mini" @click="confirmDelete(editCase)">删除</AuroraButton>
+                  </div></td>
+                </tr>
+                <tr v-else><td colspan="5" class="empty">请从左侧选择一个用例</td></tr>
+              </tbody>
+            </table>
           </div>
+
+          <template v-if="editCase">
+            <div class="edit-panel">
+              <div class="edit-toolbar">
+                <h3>{{ editCase.name }}</h3>
+                <div class="toolbar-actions">
+                  <AuroraButton class="btn-outline" size="small" @click="openTaskModal">创建任务</AuroraButton>
+                  <AuroraButton class="btn-outline" size="small" :load="saving" @click="handleSave">保存</AuroraButton>
+                </div>
+              </div>
 
           <div class="edit-body">
             <div class="edit-left" :style="{ width: leftPanelWidth + 'px' }">
@@ -95,7 +110,7 @@
                 <div class="model-select-panel">
                   <div class="select-group">
                     <label class="select-label">系统选择</label>
-                    <select v-model="editDraft.sys_name" @change="onSystemChange(editDraft.sys_name)">
+                    <select :value="editDraft.sys_name" @change="onSystemChange($event.target.value)">
                       <option value="" disabled>请选择系统</option>
                       <option v-for="s in systems" :key="s" :value="s">{{ s }}</option>
                     </select>
@@ -112,6 +127,14 @@
                       <option v-for="opt in VERSION_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
                     </select>
                   </div>
+                  <div class="select-group">
+                    <label class="select-label">仿真时间 (s)</label>
+                    <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any" />
+                  </div>
+                  <div class="select-group">
+                    <label class="select-label">仿真步长 (s)</label>
+                    <input type="number" v-model.number="editDraft.sim_step" placeholder="留空使用默认值" step="any" />
+                  </div>
                 </div>
               </template>
 
@@ -122,7 +145,7 @@
                     <thead><tr><th>参数名</th><th>参数值</th></tr></thead>
                     <tbody>
                       <tr v-for="r in g.rows" :key="r.key">
-                        <td>{{ r.key }}</td>
+                        <td>{{ r.key }}<span v-if="r.label" style="color:var(--text-secondary)"> ({{ r.label }})</span></td>
                         <td><input v-model="r.value" @blur="saveParamGroup(g)" @keydown.enter="saveParamGroup(g)" /></td>
                       </tr>
                     </tbody>
@@ -132,9 +155,10 @@
 
               <template v-else-if="activeSection==='disturb' && disturbColumns.length>0">
                 <div ref="chartEl" class="chart-container"></div>
-                <div class="var-checkboxes">
-                  <label v-for="c in disturbColumns" :key="c.name">
+                <div class="chart-legend">
+                  <label v-for="(c, i) in disturbColumns" :key="c.name" class="chart-legend-item">
                     <input type="checkbox" :checked="!!disturbVisible[c.name]" @change="toggleDisturbCol(c.name)" />
+                    <span class="legend-dot" :style="{ backgroundColor: `hsl(${(i*60)%360},70%,50%)` }"></span>
                     {{ c.name }}
                   </label>
                 </div>
@@ -145,6 +169,8 @@
           </div>
         </div>
       </template>
+    </div>
+    </div>
     </div>
 
     <!-- ═══ Add Modal ═══ -->
@@ -217,20 +243,15 @@
       </div>
     </Modal>
 
-    <!-- Result Modal -->
-    <Modal :open="resultModal.show" title="提示" @close="resultModal.show = false" :width="400">
-      <div class="result-confirm">
-        <p class="result-msg">{{ resultModal.message }}</p>
-        <div class="result-actions">
-          <button class="act-btn act-btn-confirm" @click="resultModal.show = false">确定</button>
-        </div>
-      </div>
-    </Modal>
+    <!-- Toast -->
+    <Transition name="toast">
+      <div v-if="toast.show" :class="['toast', 'toast-' + toast.type]">{{ toast.message }}</div>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, nextTick, h, onMounted } from 'vue'
+import { ref, reactive, computed, watch, nextTick, h, onMounted, onUnmounted } from 'vue'
 import type { CaseModel, ModelInfoMap, DiffRow, DisturbanceDirNode, DisturbanceColumn } from '../types/api'
 import {
   queueCases, addCase, updateCase, queueModelInfo, queueDisturbances,
@@ -260,7 +281,15 @@ const editValue = ref('')
 const editCase = ref<CaseModel | null>(null)
 const editDraft = reactive<Record<string, any>>({})
 const saving = ref(false)
-const resultModal = reactive<{ show: boolean; message: string }>({ show: false, message: '' })
+const toast = reactive<{ show: boolean; message: string; type: string }>({ show: false, message: '', type: 'success' })
+let _toastTimer: number | null = null
+function showToast(message: string, type = 'success') {
+  if (_toastTimer) clearTimeout(_toastTimer)
+  toast.message = message
+  toast.type = type
+  toast.show = true
+  _toastTimer = window.setTimeout(() => { toast.show = false }, 2000)
+}
 const modelInfo = ref<ModelInfoMap>({})
 
 // ═══════ Delete Confirm State ═══════
@@ -276,8 +305,6 @@ const trees = reactive<{ model: boolean; param: boolean; disturb: boolean; indic
 const systems = computed<string[]>(() => Object.keys(modelInfo.value))
 
 // Split pane
-const splitRatio = ref(0.5)
-const isResizing = ref(false)
 const leftPanelWidth = ref(300)
 const isResizingLeft = ref(false)
 
@@ -294,11 +321,7 @@ const taskSubmitting = ref(false)
 
 const diffRows = computed(() => {
   if (!Array.isArray(diffData.value)) return []
-  return diffData.value.map(r => ({
-    path: r.path,
-    old: r.old_value == null ? '' : typeof r.old_value === 'object' ? JSON.stringify(r.old_value) : String(r.old_value),
-    new: r.new_value == null ? '' : typeof r.new_value === 'object' ? JSON.stringify(r.new_value) : String(r.new_value),
-  }))
+  return diffData.value
 })
 
 // Param tree state
@@ -320,7 +343,7 @@ let disturbInitDone = false
 
 // ═══════ Recursive Tree Components ═══════
 const isObject = v => v && typeof v === 'object' && !Array.isArray(v)
-const isLastLayer = v => isObject(v) && Object.values(v).every(cv => !isObject(cv))
+const isLastLayer = v => isObject(v) && Object.entries(v).filter(([k]) => k !== '_labels').every(([, cv]) => !isObject(cv))
 
 const TreeNode = {
   name: 'TreeNode', props: ['name','value','path','selPath','expanded'],
@@ -403,6 +426,11 @@ onMounted(async () => {
   finally { loading.value = false }
 })
 
+onUnmounted(() => {
+  if (chartInst) { chartInst.destroy(); chartInst = null }
+  document.body.style.userSelect = ''
+})
+
 // ═══════ Inline Edit ═══════
 function startInline(c, field) { editing.id = c.id; editing.field = field; editValue.value = c[field] || '' }
 function cancelInline() { editing.id = null; editing.field = '' }
@@ -414,7 +442,7 @@ async function saveInline(c, field) {
   try {
     const body = buildCaseBody(c); body[field] = val
     const r = await updateCase(c.id, body)
-    if (r.success) { c[field] = val } else { resultModal.message = r.message; resultModal.show = true }
+    if (r.success) { c[field] = val; editDraft[field] = val } else { showToast(r.message, 'error') }
   } catch (e) { console.error('更新失败:', e) }
 }
 
@@ -424,15 +452,52 @@ function buildCaseBody(src) {
     sys_name: src.sys_name||'', model_name: src.model_name||'',
     model_verison: src.model_verison||'', model_productivity: src.model_productivity||'',
     model_param: src.model_param||'', disturbance: src.disturbance||'',
+    sim_time: src.sim_time ?? null, sim_step: src.sim_step ?? null,
   }
+}
+
+/** 构建包含所有系统参数的 model_param JSON 字符串。 */
+function buildFullModelParam(currentVars) {
+  const full = {}
+  for (const [sys, info] of Object.entries(modelInfo.value)) {
+    if (info.variables) full[sys] = JSON.parse(JSON.stringify(info.variables))
+  }
+  if (editCase.value?.model_param) {
+    try {
+      const saved = JSON.parse(editCase.value.model_param)
+      for (const [sys, vars] of Object.entries(saved)) { full[sys] = vars }
+    } catch {}
+  }
+  const name = editDraft.sys_name || editCase.value?.sys_name
+  const vars = currentVars ?? paramVars.value
+  if (name && Object.keys(vars).length > 0) {
+    full[name] = JSON.parse(JSON.stringify(vars))
+  }
+  return JSON.stringify(full)
+}
+
+/** 从全量 model_param 或 modelInfo 中提取当前系统参数子树。 */
+function extractSystemParams(sysName, savedParam) {
+  if (!sysName) return null
+  if (savedParam) {
+    try {
+      const parsed = JSON.parse(savedParam)
+      if (parsed[sysName] && typeof parsed[sysName] === 'object' && !Array.isArray(parsed[sysName]) && Object.keys(parsed[sysName]).length > 0) {
+        return normalizeTypes(parsed[sysName])
+      }
+    } catch {}
+  }
+  if (modelInfo.value[sysName]?.variables && Object.keys(modelInfo.value[sysName].variables).length > 0) {
+    return JSON.parse(JSON.stringify(modelInfo.value[sysName].variables))
+  }
+  return null
 }
 
 async function openEdit(c) {
   editCase.value = c
   Object.assign(editDraft, c)
-  if (!modelInfo.value || Object.keys(modelInfo.value).length === 0) {
-    try { const r = await queueModelInfo(); if (r.success) modelInfo.value = r.data } catch {}
-  }
+  // 始终重新加载 modelInfo 确保拿到最新数据
+  try { const r = await queueModelInfo(); if (r.success) modelInfo.value = r.data } catch {}
   // Reset all tree state
   Object.keys(trees).forEach(k => trees[k] = false)
   Object.keys(paramExpanded).forEach(k => delete paramExpanded[k])
@@ -471,16 +536,27 @@ function normalizeTypes(obj) {
 
 function initParamVars() {
   let src = {}
-  if (editDraft.model_param) {
-    try { src = normalizeTypes(JSON.parse(editDraft.model_param)) } catch {}
+  const extracted = extractSystemParams(editDraft.sys_name, editDraft.model_param)
+  if (extracted) {
+    src = extracted
   } else if (editDraft.sys_name && modelInfo.value[editDraft.sys_name]?.variables) {
     src = modelInfo.value[editDraft.sys_name].variables
-  } else if (Object.keys(modelInfo.value).length > 0) {
-    for (const [sys, info] of Object.entries(modelInfo.value)) {
-      if (info.variables) src[sys] = info.variables
-    }
   }
   paramVars.value = src
+}
+
+function expandAllParamNodes() {
+  const walk = (obj, path) => {
+    if (!isObject(obj)) return
+    for (const [k, v] of Object.entries(obj)) {
+      const p = path ? `${path}.${k}` : k
+      if (isObject(v) && !isLastLayer(v)) {
+        paramExpanded[p] = true
+        walk(v, p)
+      }
+    }
+  }
+  walk(paramVars.value, '')
 }
 
 // ═══════ Section Activation ═══════
@@ -512,6 +588,7 @@ async function toggleTree(key) {
 
   if (key === 'param') {
     // vars already initialized in openEdit / initParamVars
+    expandAllParamNodes()
   }
 
   if (key === 'disturb') {
@@ -549,8 +626,21 @@ async function toggleTree(key) {
 
 // ═══════ Tree Interactions ═══════
 function onSystemChange(sys) {
+  // 先把当前系统编辑保存到全量 model_param
+  editDraft.model_param = buildFullModelParam()
   editDraft.sys_name = sys; editDraft.model_name = sys
-  initParamVars()
+  // 从全量 model_param 或 modelInfo 加载新系统参数
+  let src = null
+  try {
+    const full = JSON.parse(editDraft.model_param)
+    if (full[sys] && typeof full[sys] === 'object' && !Array.isArray(full[sys]) && Object.keys(full[sys]).length > 0) {
+      src = normalizeTypes(full[sys])
+    }
+  } catch {}
+  if (!src && modelInfo.value[sys]?.variables && Object.keys(modelInfo.value[sys].variables).length > 0) {
+    src = JSON.parse(JSON.stringify(modelInfo.value[sys].variables))
+  }
+  if (src) paramVars.value = src
 }
 
 function onParamSelect(path) {
@@ -560,7 +650,8 @@ function onParamSelect(path) {
   let node = paramVars.value
   for (const p of parts) { if (!isObject(node)) { node = undefined; break }; node = node[p] }
   if (!isObject(node)) { paramEditGroups.value = []; return }
-  const entries = Object.entries(node)
+  const labelMap: Record<string, string> = (node as any)._labels || {}
+  const entries = Object.entries(node).filter(([k]) => k !== '_labels')
   const hasNested = entries.some(([,v]) => isObject(v))
 
   function fmt(v) {
@@ -569,17 +660,21 @@ function onParamSelect(path) {
     return String(v)
   }
 
+  function buildRow(k: string, v: unknown, labels: Record<string, string>) {
+    return { key: k, label: labels[k] || '', value: fmt(v), orig: v }
+  }
+
   if (!hasNested) {
     paramEditGroups.value = [{
       name: parts[parts.length-1], path,
-      rows: entries.map(([k,v]) => ({ key:k, value: fmt(v), orig: v })),
+      rows: entries.map(([k,v]) => buildRow(k, v, labelMap)),
     }]
     return
   }
   if (entries.every(([,v]) => isLastLayer(v))) {
     paramEditGroups.value = entries.map(([cn,cv]) => ({
       name: cn, path: `${path}.${cn}`,
-      rows: Object.entries(cv).map(([k,v]) => ({ key:k, value: fmt(v), orig: v })),
+      rows: Object.entries(cv).filter(([k]) => k !== '_labels').map(([k,v]) => buildRow(k, v, (cv as any)._labels || {})),
     }))
     return
   }
@@ -601,7 +696,7 @@ function saveParamGroup(group) {
   for (const p of parts) node = node[p]
   group.rows.forEach(r => { node[r.key] = coerceByType(r.value, r.orig) })
   paramVars.value = nv
-  editDraft.model_param = JSON.stringify(nv)
+  editDraft.model_param = buildFullModelParam(nv)
 }
 
 function onDisturbCheck(fullPath) {
@@ -647,23 +742,22 @@ watch([disturbColumns, disturbVisible], async () => {
   const series = [{},...nonEmpty.map((c,i)=>({label:c.name,stroke:`hsl(${(i*60)%360},70%,50%)`,width:1.5}))]
   const data = [xData,...nonEmpty.map(c=>c.data.map(v=>v==null?null:Number(v))||0)]
   if (chartInst) chartInst.destroy()
-  chartInst = new (uPlot as any)({width:chartEl.value.offsetWidth,height:400,cursor:{show:true},legend:{show:true},scales:{x:{time:false}},axes:[{},{stroke:'#888',grid:{stroke:'#e8e8e8'}}],series}, data, chartEl.value)
+  chartInst = new (uPlot as any)({width:chartEl.value.offsetWidth,height:400,cursor:{show:true},legend:{show:false},scales:{x:{time:false}},axes:[{},{stroke:'#888',grid:{stroke:'#e8e8e8'}}],series}, data, chartEl.value)
 })
 
 // ═══════ Save / Copy ═══════
 async function handleSave() {
   saving.value = true
   try {
-    const body = buildCaseBody({ ...editCase.value, ...editDraft })
+    const body = buildCaseBody({ ...editCase.value, ...editDraft, model_param: buildFullModelParam() })
     const r = await updateCase(editCase.value.id, body)
     if (r.success) {
       Object.assign(editCase.value, editDraft)
       const idx = cases.value.findIndex(c => c.id === editCase.value.id)
       if (idx >= 0) cases.value[idx] = { ...editCase.value }
-      resultModal.message = '保存成功'
-      resultModal.show = true
-    } else { resultModal.message = r.message || '保存失败'; resultModal.show = true }
-  } catch (e) { resultModal.message = '保存失败'; resultModal.show = true }
+      showToast('保存成功')
+    } else { showToast(r.message || '保存失败', 'error') }
+  } catch (e) { showToast('保存失败', 'error') }
   finally { saving.value = false }
 }
 
@@ -699,7 +793,7 @@ async function handleDelete() {
 }
 
 async function handleAdd() {
-  if (!form.name.trim() || !form.description.trim()) return
+  if (!form.name.trim()) return
   submitting.value = true
   try {
     const r = await addCase({
@@ -717,27 +811,6 @@ async function handleAdd() {
     } else { /* error shown by request interceptor */ }
   } catch (e) { console.error('添加失败:', e) }
   finally { submitting.value = false }
-}
-
-// ═══════ Resize Split Pane (horizontal - case list / edit panel) ═══════
-function startResize(e: MouseEvent): void {
-  isResizing.value = true
-  const container = (e.target as HTMLElement).parentElement!
-  const containerTop = container.getBoundingClientRect().top
-  const containerHeight = container.offsetHeight
-  document.body.style.userSelect = 'none'
-  function onMove(ev) {
-    const newRatio = (ev.clientY - containerTop) / containerHeight
-    splitRatio.value = Math.min(0.8, Math.max(0.2, newRatio))
-  }
-  function onUp() {
-    isResizing.value = false
-    document.body.style.userSelect = ''
-    document.removeEventListener('mousemove', onMove)
-    document.removeEventListener('mouseup', onUp)
-  }
-  document.addEventListener('mousemove', onMove)
-  document.addEventListener('mouseup', onUp)
 }
 
 function startResizeLeft(e: MouseEvent): void {
@@ -788,11 +861,30 @@ async function handleUnshare(user) {
 async function openTaskModal() {
   await handleSave()
   if (!editCase.value) return
-  const body = buildCaseBody({ ...editCase.value, ...editDraft })
+  const body = buildCaseBody({ ...editCase.value, ...editDraft, model_param: buildFullModelParam() })
   try {
     const r = await diffCase(editCase.value.id, body)
-    if (r.success) { diffData.value = r.data; taskModalOpen.value = true }
-  } catch { resultModal.message = '获取差异失败'; resultModal.show = true }
+    if (r.success && r.data) {
+      // 将 DeepDiff dict 转成表格行数组
+      const diffDict = r.data
+      function cleanPath(raw) {
+        return raw.replace(/^root/, '').replace(/\['([^']*)'\]/g, '.$1').replace(/\["([^"]*)"\]/g, '.$1').replace(/^\./, '')
+      }
+      const rows = []
+      const fmt = (v) => v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v)
+      for (const [changeType, items] of Object.entries(diffDict)) {
+        if (!items || typeof items !== 'object') continue
+        const prefix = changeType.includes('added') ? '+ ' : changeType.includes('removed') ? '- ' : ''
+        for (const [path, v] of Object.entries(items)) {
+          rows.push({ path: prefix + cleanPath(path), old: fmt(v.old_value), new: fmt(v.new_value) })
+        }
+      }
+      diffData.value = rows
+      taskModalOpen.value = true
+    } else {
+      showToast(r.message || '获取差异失败', 'error')
+    }
+  } catch { showToast('获取差异失败', 'error') }
 }
 
 async function handleRunTask() {
@@ -806,10 +898,9 @@ async function handleRunTask() {
     const runR = await runTasks(taskIds)
     if (runR.success) {
       taskModalOpen.value = false
-      resultModal.message = `任务已提交 (ID: ${taskIds.join(',')})`
-      resultModal.show = true
+      showToast(`任务已提交 (ID: ${taskIds.join(',')})`)
     }
-  } catch { resultModal.message = '任务提交失败'; resultModal.show = true }
+  } catch { showToast('任务提交失败', 'error') }
   finally { taskSubmitting.value = false }
 }
 </script>
@@ -817,15 +908,42 @@ async function handleRunTask() {
 <style scoped>
 .case-page { display:flex; flex-direction:column; gap:20px; }
 
-/* Split pane */
-.split-container { display:flex; flex-direction:column; height:calc(100vh - 120px); }
-.case-list { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex-shrink:0; }
-.edit-panel { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex:1; overflow:auto; min-height:0; }
+/* ── Outer Layout: sidebar + main ── */
+.case-layout { display:flex; flex-direction:row; height:calc(100vh - 120px); gap:0; }
 
-.resize-handle {
-  height:6px; cursor:row-resize; background:var(--border); flex-shrink:0; transition:background 0.15s;
+/* ── Left Sidebar ── */
+.case-sidebar {
+  width: 200px; flex-shrink: 0; overflow-y: auto;
+  background: var(--panel-bg); border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex; flex-direction: column;
 }
-.resize-handle:hover, .resize-handle.dragging { background:var(--accent); }
+.sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.sidebar-title { font-size: 14px; font-weight: 600; }
+.btn-create { min-width: 56px; height: 32px; padding: 0 8px; font-size: 13px; font-weight: 500; line-height: 32px; text-align: center; }
+.sidebar-loading, .sidebar-empty { padding: 24px 16px; font-size: 13px; color: var(--text-secondary); text-align: center; }
+.sidebar-list { list-style: none; margin: 0; padding: 4px 0; flex: 1; overflow-y: auto; }
+.sidebar-item {
+  padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--text);
+  border-left: 3px solid transparent; transition: background 0.1s, border-color 0.1s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-item:hover { background: #f5f7fa; }
+.sidebar-item-active { background: var(--accent-light); border-left-color: var(--accent); font-weight: 500; }
+.sidebar-item-text { display: block; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Right Main Content ── */
+.case-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+
+/* Split pane — vertical: table + edit panel */
+.split-container { display:flex; flex-direction:column; height:100%; font-size:13px; }
+.case-list { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex-shrink:0; overflow:auto; }
+.edit-panel { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex:1; overflow:auto; min-height:0; }
+.page-header h2 { font-size:15px; font-weight:600; }
+.edit-toolbar h3 { font-size:15px; font-weight:600; }
 
 /* Shared button style */
 .btn-outline { color: var(--accent) !important; border: none !important; background: transparent !important; font-weight: 500 !important; transition: background 0.15s; }
@@ -837,8 +955,6 @@ async function handleRunTask() {
 
 /* Table */
 .page-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--border); }
-.page-header h2 { font-size:16px; font-weight:600; }
-.page-header .aurora-button { font-weight:600; font-size:14px; padding:10px 24px; border: 1px solid var(--accent) !important; border-radius: 5px !important; }
 .case-list th:first-child, .case-list td:first-child { padding-left:24px; }
 .case-list th:last-child, .case-list td:last-child { padding-right:24px; }
 .empty { text-align:center; color:var(--text-secondary); padding:60px 0; }
@@ -847,13 +963,12 @@ async function handleRunTask() {
 .editable-cell:hover { border-color:var(--border); background:#fafbfc; }
 .inline-input { width:100%; font-size:13px; padding:2px 4px; }
 .actions-cell { display:flex; gap:6px; align-items:center; }
-.actions-cell .aurora-button { color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: box-shadow 0.15s, transform 0.15s; }
-.actions-cell .aurora-button:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.18); transform: translateY(-1px); }
 .row-selected td { background:var(--accent-light); }
+.edit-placeholder { display:flex; align-items:center; justify-content:center; height:100%; color:#999; font-size:14px; background:var(--panel-bg); border-radius:var(--radius); }
 
 /* Edit Panel */
 .edit-toolbar { display:flex; align-items:center; gap:16px; padding:14px 24px; border-bottom:1px solid var(--border); background:#fafbfc; }
-.edit-toolbar h3 { flex:1; font-size:16px; font-weight:600; }
+.edit-toolbar h3 { flex:1; }
 .toolbar-actions { display:flex; gap:8px; }
 
 .edit-body { display:flex; flex:1; min-height:0; }
@@ -898,9 +1013,11 @@ async function handleRunTask() {
 .param-table input { font-size:13px; padding:4px 8px; }
 
 /* Chart */
-.chart-container { width:100%; margin-bottom:12px; }
-.var-checkboxes { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:10px; padding:10px; background:#fafbfc; border-radius:4px; }
-.var-checkboxes label { display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer; }
+.chart-container { width:100%; margin-bottom:8px; }
+.chart-legend { display:flex; flex-wrap:wrap; gap:4px 16px; padding:6px 4px; font-size:12px; }
+.chart-legend-item { display:inline-flex; align-items:center; gap:4px; cursor:pointer; user-select:none; }
+.chart-legend-item:hover { text-decoration:line-through; }
+.legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 
 /* Modal form */
 .form-group { margin-bottom: 16px; }
@@ -943,8 +1060,16 @@ async function handleRunTask() {
 .act-btn-cancel { background: var(--accent); color: #fff; }
 .act-btn-confirm { background: var(--accent); color: #fff; }
 
-/* Result modal */
-.result-confirm { text-align: center; }
-.result-msg { font-size: 14px; color: var(--text); margin-bottom: 16px; }
-.result-actions { display: flex; gap: 10px; justify-content: center; align-items: center; padding-top: 16px; border-top: 1px solid var(--border); }
+/* Toast */
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 9999;
+  padding: 10px 28px; border-radius: 6px; font-size: 14px; font-weight: 500;
+  pointer-events: none; white-space: nowrap;
+}
+.toast-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.toast-error { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+
+.toast-enter-active { transition: all 0.25s ease-out; }
+.toast-leave-active { transition: all 0.2s ease-in; }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(-12px); }
 </style>
