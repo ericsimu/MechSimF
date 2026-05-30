@@ -798,7 +798,7 @@ async function handleAdd() {
   try {
     const r = await addCase({
       name: form.name.trim(), description: form.description.trim(), create_by: getCurrentUser(),
-      sys_name:'', model_name:'', model_verison:'', model_productivity:'', model_param:'', disturbance:'',
+      sys_name:'', model_name:'', model_verison:'3X', model_productivity:'100WPH', model_param:'', disturbance:'',
     })
     if (r.success) {
       form.name = ''; form.description = ''; modalOpen.value = false
