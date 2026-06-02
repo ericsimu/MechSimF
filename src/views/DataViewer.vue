@@ -11,8 +11,8 @@
         <div v-if="loading" class="dv-loading">加载中...</div>
         <div v-else-if="taskStatus === 'cancelled'" class="dv-empty">该任务已被取消，无仿真数据</div>
         <div v-else-if="taskStatus === 'failed'" class="dv-empty">
-          <div>任务执行失败</div>
-          <div v-if="taskError" style="margin-top:8px;font-size:12px;color:#999;max-width:500px;word-break:break-all">{{ taskError }}</div>
+          <div style="font-size:16px;font-weight:600;color:#ef4444;margin-bottom:16px">任务执行失败</div>
+          <div style="font-size:13px;color:#666">失败原因：{{ taskError || '未知错误' }}</div>
         </div>
         <div v-else-if="columns.length === 0" class="dv-empty">该任务暂无输出数据</div>
         <div v-else class="viz-body">
