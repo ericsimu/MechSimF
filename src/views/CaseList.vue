@@ -946,7 +946,7 @@ async function handleRunTask() {
 /* Split pane — vertical: table + edit panel */
 .split-container { display:flex; flex-direction:column; height:100%; font-size:13px; }
 .case-list { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex-shrink:0; overflow:auto; }
-.edit-panel { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex:1; overflow:auto; min-height:0; }
+.edit-panel { background:var(--panel-bg); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,0.08); flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
 .page-header h2 { font-size:15px; font-weight:600; }
 .edit-toolbar h3 { font-size:15px; font-weight:600; }
 
@@ -979,7 +979,7 @@ async function handleRunTask() {
 .edit-body { display:flex; flex:1; min-height:0; }
 
 /* Left panel - tree sections */
-.edit-left { flex-shrink:0; border-right:1px solid var(--border); overflow-y:auto; padding:8px 0; }
+.edit-left { flex-shrink:0; border-right:1px solid var(--border); overflow-y:auto; padding:8px 0; min-height:0; }
 .h-resize-handle {
   width: 5px; cursor: col-resize; background: var(--border); flex-shrink: 0; transition: background 0.15s;
 }
