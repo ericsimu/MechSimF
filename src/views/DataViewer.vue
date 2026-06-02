@@ -10,6 +10,10 @@
       <div class="rp-right" style="flex:1;">
         <div v-if="loading" class="dv-loading">加载中...</div>
         <div v-else-if="taskStatus === 'cancelled'" class="dv-empty">该任务已被取消，无仿真数据</div>
+        <div v-else-if="taskStatus === 'failed'" class="dv-empty">
+          <div>任务执行失败</div>
+          <div v-if="taskError" style="margin-top:8px;font-size:12px;color:#999;max-width:500px;word-break:break-all">{{ taskError }}</div>
+        </div>
         <div v-else-if="columns.length === 0" class="dv-empty">该任务暂无输出数据</div>
         <div v-else class="viz-body">
           <div class="viz-left">
@@ -43,7 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { getTaskDataColumns, getTaskSignals } from '../api/index'
+import { getTaskDataColumns, getTaskSignals, getTaskStatus } from '../api/index'
 import type { DisturbanceColumn } from '../types/api'
 import uPlot from '../lib/uplot/uPlot.esm.js'
 import '../lib/uplot/uPlot.min.css'
@@ -54,6 +58,7 @@ const loading = ref(true)
 const columns = ref<DisturbanceColumn[]>([])
 const fftColumns = ref<DisturbanceColumn[]>([])
 const taskStatus = ref('')
+const taskError = ref('')
 const checked = ref<Record<string, boolean>>({})
 
 // Zoom state: saved full-range data for reset
@@ -403,7 +408,8 @@ onMounted(async () => {
   const tid = taskId.value
   if (!tid) { loading.value = false; return }
   try {
-    const r = await getTaskDataColumns(tid)
+    const [r, statusR] = await Promise.all([getTaskDataColumns(tid), getTaskStatus(tid)])
+    if (statusR.success && statusR.data) taskError.value = statusR.data.error || ''
     if (r.success && r.data) {
       columns.value = [
         { name: 'time', data: [] as (number | null)[] },
