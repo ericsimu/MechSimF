@@ -115,22 +115,24 @@
                       <option v-for="s in systems" :key="s" :value="s">{{ s }}</option>
                     </select>
                   </div>
-                  <div class="select-group">
-                    <label class="select-label">产率</label>
-                    <select v-model="editDraft.model_productivity">
-                      <option v-for="opt in PRODUCTIVITY_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
-                    </select>
-                  </div>
-                  <div class="select-group">
-                    <label class="select-label">版本</label>
-                    <select v-model="editDraft.model_verison">
-                      <option v-for="opt in VERSION_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
-                    </select>
-                  </div>
-                  <div class="select-group">
-                    <label class="select-label">仿真时间 (s)</label>
-                    <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any"
-                      @blur="e => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0 && v > 19.2) { editDraft.sim_time = 19.2; showToast('仿真时间不能超过 19.2s，已自动修正', 'error') } }" />
+                  <div class="select-row">
+                    <div class="select-group">
+                      <label class="select-label">产率</label>
+                      <select v-model="editDraft.model_productivity">
+                        <option v-for="opt in PRODUCTIVITY_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+                      </select>
+                    </div>
+                    <div class="select-group">
+                      <label class="select-label">版本</label>
+                      <select v-model="editDraft.model_verison">
+                        <option v-for="opt in VERSION_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+                      </select>
+                    </div>
+                    <div class="select-group">
+                      <label class="select-label">仿真时间 (s)</label>
+                      <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any"
+                        @blur="e => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0 && v > 19.2) { editDraft.sim_time = 19.2; showToast('仿真时间不能超过 19.2s，已自动修正', 'error') } }" />
+                    </div>
                   </div>
                   <div v-if="editDraft.sys_name" class="model-image">
                     <img :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
@@ -1002,6 +1004,8 @@ async function handleRunTask() {
 
 /* Model select panel */
 .model-select-panel { max-width:400px; }
+.select-row { display:flex; gap:12px; }
+.select-row .select-group { flex:1; min-width:0; }
 .select-group { margin-bottom:16px; }
 .select-label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px; }
 
