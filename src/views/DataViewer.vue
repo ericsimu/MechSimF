@@ -300,7 +300,7 @@ function buildFreqChart(): void {
   if (activeSigs.length === 0 || !freqCol || freqCol.data.length === 0) return
 
   const w = el.offsetWidth || 800
-  freqLabels = makeCursorLabels(el, 'Hz')
+  freqLabels = makeCursorLabels(el, '')
 
   const series: Array<object> = [{}]
   activeSigs.forEach((c) => {

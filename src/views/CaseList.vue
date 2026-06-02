@@ -678,7 +678,12 @@ function onParamSelect(path) {
     }))
     return
   }
-  paramEditGroups.value = []
+  // Mixed: some leaf values + some nested nodes — show leaf values as param group
+  const leafEntries = entries.filter(([,v]) => !isObject(v))
+  paramEditGroups.value = leafEntries.length > 0 ? [{
+    name: parts[parts.length-1], path,
+    rows: leafEntries.map(([k,v]) => buildRow(k, v, labelMap)),
+  }] : []
 }
 
 function coerceByType(val, orig) {
