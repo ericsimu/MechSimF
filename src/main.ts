@@ -22,6 +22,9 @@ const routes: RouteRecordRaw[] = [
     name: 'Data',
     component: () => import('./views/DataViewer.vue'),
   },
+  { path: '/data-manage', name: 'DataManage', component: () => import('./views/Placeholder.vue') },
+  { path: '/tools', name: 'Tools', component: () => import('./views/Placeholder.vue') },
+  { path: '/manual', name: 'Manual', component: () => import('./views/Placeholder.vue') },
 ]
 
 const router = createRouter({

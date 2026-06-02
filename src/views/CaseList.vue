@@ -129,11 +129,8 @@
                   </div>
                   <div class="select-group">
                     <label class="select-label">仿真时间 (s)</label>
-                    <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any" />
-                  </div>
-                  <div class="select-group">
-                    <label class="select-label">仿真步长 (s)</label>
-                    <input type="number" v-model.number="editDraft.sim_step" placeholder="留空使用默认值" step="any" />
+                    <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any"
+                      @blur="e => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0 && v > 19.2) { editDraft.sim_time = 19.2; showToast('仿真时间不能超过 19.2s，已自动修正', 'error') } }" />
                   </div>
                 </div>
               </template>

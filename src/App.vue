@@ -77,6 +77,9 @@ const navItems: NavItem[] = [
       { path: '/data', label: '日志查看' },
     ],
   },
+  { path: '/data-manage', label: '数据管理（待添加）' },
+  { path: '/tools', label: '工具箱（待添加）' },
+  { path: '/manual', label: '用户手册（待添加）' },
 ]
 
 function isActive(path: string): boolean {
@@ -114,7 +117,7 @@ function goTo(path: string) {
   padding: 12px 20px;
   color: rgba(255,255,255,0.85);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
 }
@@ -130,18 +133,21 @@ function goTo(path: string) {
 
 .nav-parent {
   padding: 12px 20px 4px;
-  color: rgba(255,255,255,0.85);
-  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .nav-sub { padding: 0 0 8px; }
 
 .nav-sub-item {
   display: block;
-  padding: 8px 20px 8px 40px;
+  padding: 10px 20px 8px 40px;
   color: rgba(255,255,255,0.7);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
 }
