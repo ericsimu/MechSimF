@@ -20,9 +20,9 @@
           <td><span v-if="t.param_diff" class="task-id-link" @click="showDiff(t)">查看</span><span v-else>-</span></td>
           <td>{{ t.create_time ? new Date(t.create_time).toLocaleString() : '-' }}</td>
           <td>
-            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="$router.push('/data/' + t.id)">详情</button>
-            <button v-if="t.status === 'pending' || t.status === 'running'" class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="handleCancel(t)">取消</button>
-            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="confirmDelete(t)">删除</button>
+            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);box-shadow:none;border:none;background:none;" @click="$router.push('/data/' + t.id)">详情</button>
+            <button v-if="t.status === 'pending' || t.status === 'running'" class="aurora-btn aurora-btn--text" style="color:var(--accent);box-shadow:none;border:none;background:none;" @click="handleCancel(t)">取消</button>
+            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);box-shadow:none;border:none;background:none;" @click="confirmDelete(t)">删除</button>
           </td>
         </tr>
       </tbody>
