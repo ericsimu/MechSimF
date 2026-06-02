@@ -137,7 +137,7 @@
                   <div v-if="editDraft.sys_name" class="model-image">
                     <img :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
                       :alt="editDraft.sys_name + ' model'"
-                      style="max-width:100%;margin-top:12px;border-radius:6px;border:1px solid var(--border);"
+                      style="width:100%;min-height:80px;margin-top:12px;border-radius:6px;border:1px solid var(--border);"
                       @error="e => e.target.style.display='none'" />
                   </div>
                 </div>
