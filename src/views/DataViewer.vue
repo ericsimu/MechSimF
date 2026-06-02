@@ -9,6 +9,7 @@
     <div v-else class="rp-body">
       <div class="rp-right" style="flex:1;">
         <div v-if="loading" class="dv-loading">加载中...</div>
+        <div v-else-if="taskStatus === 'cancelled'" class="dv-empty">该任务已被取消，无仿真数据</div>
         <div v-else-if="columns.length === 0" class="dv-empty">该任务暂无输出数据</div>
         <div v-else class="viz-body">
           <div class="viz-left">
