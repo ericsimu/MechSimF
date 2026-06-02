@@ -132,6 +132,12 @@
                     <input type="number" v-model.number="editDraft.sim_time" placeholder="留空使用默认值" step="any"
                       @blur="e => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0 && v > 19.2) { editDraft.sim_time = 19.2; showToast('仿真时间不能超过 19.2s，已自动修正', 'error') } }" />
                   </div>
+                  <div v-if="editDraft.sys_name" class="model-image">
+                    <img :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
+                      :alt="editDraft.sys_name + ' model'"
+                      style="max-width:100%;margin-top:12px;border-radius:6px;border:1px solid var(--border);"
+                      @error="e => e.target.style.display='none'" />
+                  </div>
                 </div>
               </template>
 
