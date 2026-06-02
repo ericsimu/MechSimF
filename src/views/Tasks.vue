@@ -21,8 +21,8 @@
           <td>{{ t.create_time ? new Date(t.create_time).toLocaleString() : '-' }}</td>
           <td>
             <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="$router.push('/data/' + t.id)">详情</button>
-            <button v-if="t.status === 'pending' || t.status === 'running'" class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="handleCancel(t)">取消</button>
-            <button class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="confirmDelete(t)">删除</button>
+            <button v-if="t.status === 'pending' || t.status === 'running'" class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="handleCancel(t)">取消</button>
+            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="confirmDelete(t)">删除</button>
           </td>
         </tr>
       </tbody>
