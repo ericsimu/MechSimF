@@ -999,11 +999,11 @@ async function handleRunTask() {
 .tree-section-header:hover { background: #f5f7fa; }
 .section-active { background: var(--accent-light); }
 .tree-section-title { flex: 1; }
-.edit-right { flex:1; padding:16px 20px; overflow-y:auto; }
+.edit-right { flex:1; padding:16px 24px; overflow-y:auto; }
 .edit-right-empty { display:flex; align-items:center; justify-content:center; height:100%; color:#999; font-size:13px; }
 
 /* Model select panel */
-.model-select-panel { max-width:400px; }
+.model-select-panel { width:100%; }
 .select-row { display:flex; gap:16px; }
 .select-row .select-group { flex:1; min-width:0; }
 .select-group { margin-bottom:16px; }
