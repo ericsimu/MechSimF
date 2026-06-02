@@ -108,14 +108,14 @@
             <div class="edit-right">
               <template v-if="activeSection==='model'">
                 <div class="model-select-panel">
-                  <div class="select-group">
-                    <label class="select-label">系统选择</label>
-                    <select :value="editDraft.sys_name" @change="onSystemChange($event.target.value)">
-                      <option value="" disabled>请选择系统</option>
-                      <option v-for="s in systems" :key="s" :value="s">{{ s }}</option>
-                    </select>
-                  </div>
                   <div class="select-row">
+                    <div class="select-group">
+                      <label class="select-label">系统选择</label>
+                      <select :value="editDraft.sys_name" @change="onSystemChange($event.target.value)">
+                        <option value="" disabled>请选择系统</option>
+                        <option v-for="s in systems" :key="s" :value="s">{{ s }}</option>
+                      </select>
+                    </div>
                     <div class="select-group">
                       <label class="select-label">产率</label>
                       <select v-model="editDraft.model_productivity">
