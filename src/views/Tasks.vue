@@ -20,7 +20,8 @@
           <td><span v-if="t.param_diff" class="task-id-link" @click="showDiff(t)">查看</span><span v-else>-</span></td>
           <td>{{ t.create_time ? new Date(t.create_time).toLocaleString() : '-' }}</td>
           <td>
-            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="$router.push('/data/' + t.id)">查看详情</button>
+            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="$router.push('/data/' + t.id)">详情</button>
+            <button v-if="t.status === 'pending' || t.status === 'running'" class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="handleCancel(t)">取消</button>
             <button class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="confirmDelete(t)">删除</button>
           </td>
         </tr>
@@ -66,7 +67,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { SimTask } from '../types/api'
-import { queueTasks, deleteTask } from '../api/index'
+import { queueTasks, deleteTask, cancelTask } from '../api/index'
 
 interface DiffRow { path: string; old: string; new: string }
 
@@ -107,6 +108,14 @@ async function handleDelete(): Promise<void> {
     if (r.success) { deleteTarget.value = null; loadTasks() }
   } catch { /* */ }
   finally { deleting.value = false }
+}
+
+async function handleCancel(task: SimTask): Promise<void> {
+  if (!confirm(`确定要取消任务 #${task.id}「${task.name}」吗？这将强制终止 MATLAB 进程。`)) return
+  try {
+    const r = await cancelTask(task.id!)
+    if (r.success) { loadTasks() }
+  } catch { /* */ }
 }
 
 function showDiff(task: SimTask): void {
