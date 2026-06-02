@@ -77,9 +77,9 @@ const navItems: NavItem[] = [
       { path: '/data', label: '日志查看' },
     ],
   },
-  { path: '/data-manage', label: '数据管理（待添加）' },
-  { path: '/tools', label: '工具箱（待添加）' },
-  { path: '/manual', label: '用户手册（待添加）' },
+  { path: '/data-manage', label: '数据管理' },
+  { path: '/tools', label: '工具箱' },
+  { path: '/manual', label: '用户手册' },
 ]
 
 function isActive(path: string): boolean {
