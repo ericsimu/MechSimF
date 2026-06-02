@@ -316,7 +316,7 @@ function buildFreqChart(): void {
     width: w, height: 300,
     cursor: { show: true, drag: { setScale: true, x: true, y: false } },
     legend: { show: false },
-    scales: { x: { time: false } },
+    scales: { x: { time: false, distr: 3 } },
     axes: [
       { label: 'Frequency (Hz)', grid: { stroke: '#e8e8e8' }, stroke: '#888' },
       { stroke: '#888', grid: { stroke: '#e8e8e8' } },
