@@ -1004,7 +1004,7 @@ async function handleRunTask() {
 
 /* Model select panel */
 .model-select-panel { max-width:400px; }
-.select-row { display:flex; gap:12px; }
+.select-row { display:flex; gap:16px; }
 .select-row .select-group { flex:1; min-width:0; }
 .select-group { margin-bottom:16px; }
 .select-label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px; }
