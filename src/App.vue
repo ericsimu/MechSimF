@@ -72,9 +72,9 @@ const navItems: NavItem[] = [
     label: '结果分析',
     children: [
       { path: '/data', label: '数据可视化' },
-      { path: '/data', label: '指标查看' },
-      { path: '/data', label: '报告查看' },
-      { path: '/data', label: '日志查看' },
+      { path: '/indicators', label: '指标查看' },
+      { path: '/reports', label: '报告查看' },
+      { path: '/logs', label: '日志查看' },
     ],
   },
   { path: '/data-manage', label: '数据管理' },
