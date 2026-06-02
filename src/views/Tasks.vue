@@ -10,7 +10,7 @@
       <tbody>
         <tr v-if="tasks.length === 0"><td colspan="10" class="empty">暂无数据</td></tr>
         <tr v-for="t in tasks" :key="t.id">
-          <td><router-link :to="'/data/' + t.id" class="task-id-link">{{ t.id }}</router-link></td>
+          <td>{{ t.id }}</td>
           <td>{{ t.name }}</td>
           <td>{{ t.sys_name || '-' }}</td>
           <td>{{ t.model_name || '-' }}</td>
@@ -19,7 +19,10 @@
           <td><span class="status-tag" :class="'status-' + t.status">{{ statusLabel(t.status) }}</span></td>
           <td><span v-if="t.param_diff" class="task-id-link" @click="showDiff(t)">查看</span><span v-else>-</span></td>
           <td>{{ t.create_time ? new Date(t.create_time).toLocaleString() : '-' }}</td>
-          <td><button class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="confirmDelete(t)">删除</button></td>
+          <td>
+            <button class="aurora-btn aurora-btn--text" style="color:var(--accent);" @click="$router.push('/data/' + t.id)">查看详情</button>
+            <button class="aurora-btn aurora-btn--text" style="color:#ef4444;" @click="confirmDelete(t)">删除</button>
+          </td>
         </tr>
       </tbody>
     </table>
