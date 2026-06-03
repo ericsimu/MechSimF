@@ -408,12 +408,14 @@ onMounted(async () => {
   const tid = taskId.value
   if (!tid) { loading.value = false; return }
   try {
-    const [r, statusR] = await Promise.all([getTaskDataColumns(tid), getTaskStatus(tid)])
+    const statusR = await getTaskStatus(tid)
     if (statusR.success && statusR.data) {
-      taskError.value = statusR.data.error || ''
       taskStatus.value = statusR.data.status || ''
+      taskError.value = statusR.data.error || ''
     }
-    if (r.success && r.data) {
+    if (taskStatus.value === 'done') {
+      const r = await getTaskDataColumns(tid)
+      if (r.success && r.data) {
       columns.value = [
         { name: 'time', data: [] as (number | null)[] },
         ...r.data.column_names.map((n: string) => ({ name: n, data: [] as (number | null)[] })),
@@ -424,6 +426,7 @@ onMounted(async () => {
       ]
       taskStatus.value = r.data.task_status
       checked.value = {}
+    }
     }
   } catch { /* */ }
   finally { loading.value = false }
