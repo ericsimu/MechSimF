@@ -409,7 +409,10 @@ onMounted(async () => {
   if (!tid) { loading.value = false; return }
   try {
     const [r, statusR] = await Promise.all([getTaskDataColumns(tid), getTaskStatus(tid)])
-    if (statusR.success && statusR.data) taskError.value = statusR.data.error || ''
+    if (statusR.success && statusR.data) {
+      taskError.value = statusR.data.error || ''
+      taskStatus.value = statusR.data.status || ''
+    }
     if (r.success && r.data) {
       columns.value = [
         { name: 'time', data: [] as (number | null)[] },
