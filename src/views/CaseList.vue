@@ -135,10 +135,13 @@
                     </div>
                   </div>
                   <div v-if="editDraft.sys_name" class="model-image">
-                    <img :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
+                    <img :key="editDraft.sys_name" :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
                       :alt="editDraft.sys_name + ' model'"
                       style="width:100%;min-height:120px;margin-top:12px;border-radius:6px;border:1px solid var(--border);object-fit:contain;display:block;"
-                      @error="e => e.target.style.display='none'" />
+                      @error="e => { e.target.style.display='none'; imgFailed[editDraft.sys_name] = true }"
+                      v-if="!imgFailed[editDraft.sys_name]" />
+                    <div v-else style="width:100%;min-height:120px;margin-top:12px;border-radius:6px;border:1px solid var(--border);
+                      display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">没有相关图片</div>
                   </div>
                 </div>
               </template>
@@ -302,6 +305,7 @@ const deleteModalOpen = ref(false)
 const deleteTarget = ref<CaseModel | null>(null)
 const deleting = ref(false)
 const activeSection = ref('')
+const imgFailed = reactive<Record<string, boolean>>({})
 
 // Tree loaded flags (lazy loading)
 const trees = reactive<{ model: boolean; param: boolean; disturb: boolean; indicator: boolean }>({ model: false, param: false, disturb: false, indicator: false })
