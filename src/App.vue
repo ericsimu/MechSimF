@@ -29,7 +29,7 @@
     </aside>
     <div class="app-body">
       <header class="app-header">
-        <span class="header-breadcrumb">MechSim 仿真平台</span>
+        <span class="header-breadcrumb">MechSim (机电仿真平台)</span>
       </header>
       <main class="app-main">
         <router-view />
