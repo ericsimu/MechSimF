@@ -371,7 +371,7 @@ const TreeNode = {
         ]),
         nested && !childLast && p.expanded[p.path]
           ? h('div',{class:'tree-children'},
-              Object.entries(p.value).map(([k,v])=>h(TreeNode,{
+              Object.entries(p.value).filter(([k])=>k!=='_labels'&&k!=='_units').map(([k,v])=>h(TreeNode,{
                 key:k,name:k,value:v,path:`${p.path}.${k}`,
                 selPath:p.selPath,expanded:p.expanded,
                 onToggle:pp=>emit('toggle',pp),onSelect:pp=>emit('select',pp),
