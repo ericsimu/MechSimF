@@ -153,7 +153,7 @@
                     <thead><tr><th>参数名</th><th>参数值</th></tr></thead>
                     <tbody>
                       <tr v-for="r in g.rows" :key="r.key">
-                        <td>{{ r.key }}<span v-if="r.label" style="color:var(--text-secondary)"> ({{ r.label }})</span></td>
+                        <td>{{ r.key }}<span v-if="r.label" style="color:var(--text-secondary)"> ({{ r.label }}{{ r.unit ? ', ' + r.unit : '' }})</span><span v-else-if="r.unit" style="color:var(--text-secondary)"> ({{ r.unit }})</span></td>
                         <td><input v-model="r.value" @blur="saveParamGroup(g)" @keydown.enter="saveParamGroup(g)" /></td>
                       </tr>
                     </tbody>
@@ -352,7 +352,7 @@ let disturbInitDone = false
 
 // ═══════ Recursive Tree Components ═══════
 const isObject = v => v && typeof v === 'object' && !Array.isArray(v)
-const isLastLayer = v => isObject(v) && Object.entries(v).filter(([k]) => k !== '_labels').every(([, cv]) => !isObject(cv))
+const isLastLayer = v => isObject(v) && Object.entries(v).filter(([k]) => k !== '_labels' && k !== '_units').every(([, cv]) => !isObject(cv))
 
 const TreeNode = {
   name: 'TreeNode', props: ['name','value','path','selPath','expanded'],
@@ -660,7 +660,8 @@ function onParamSelect(path) {
   for (const p of parts) { if (!isObject(node)) { node = undefined; break }; node = node[p] }
   if (!isObject(node)) { paramEditGroups.value = []; return }
   const labelMap: Record<string, string> = (node as any)._labels || {}
-  const entries = Object.entries(node).filter(([k]) => k !== '_labels')
+  const unitMap: Record<string, string> = (node as any)._units || {}
+  const entries = Object.entries(node).filter(([k]) => k !== '_labels' && k !== '_units')
   const hasNested = entries.some(([,v]) => isObject(v))
 
   function fmt(v) {
@@ -669,21 +670,21 @@ function onParamSelect(path) {
     return String(v)
   }
 
-  function buildRow(k: string, v: unknown, labels: Record<string, string>) {
-    return { key: k, label: labels[k] || '', value: fmt(v), orig: v }
+  function buildRow(k: string, v: unknown, labels: Record<string, string>, units: Record<string, string>) {
+    return { key: k, label: labels[k] || '', unit: units[k] || '', value: fmt(v), orig: v }
   }
 
   if (!hasNested) {
     paramEditGroups.value = [{
       name: parts[parts.length-1], path,
-      rows: entries.map(([k,v]) => buildRow(k, v, labelMap)),
+      rows: entries.map(([k,v]) => buildRow(k, v, labelMap, unitMap)),
     }]
     return
   }
   if (entries.every(([,v]) => isLastLayer(v))) {
     paramEditGroups.value = entries.map(([cn,cv]) => ({
       name: cn, path: `${path}.${cn}`,
-      rows: Object.entries(cv).filter(([k]) => k !== '_labels').map(([k,v]) => buildRow(k, v, (cv as any)._labels || {})),
+      rows: Object.entries(cv).filter(([k]) => k !== '_labels' && k !== '_units').map(([k,v]) => buildRow(k, v, (cv as any)._labels || {}, (cv as any)._units || {})),
     }))
     return
   }
@@ -691,7 +692,7 @@ function onParamSelect(path) {
   const leafEntries = entries.filter(([,v]) => !isObject(v))
   paramEditGroups.value = leafEntries.length > 0 ? [{
     name: parts[parts.length-1], path,
-    rows: leafEntries.map(([k,v]) => buildRow(k, v, labelMap)),
+    rows: leafEntries.map(([k,v]) => buildRow(k, v, labelMap, unitMap)),
   }] : []
 }
 
