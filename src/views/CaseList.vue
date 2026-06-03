@@ -150,11 +150,12 @@
                 <div v-for="g in paramEditGroups" :key="g.name" class="param-group">
                   <div class="param-group-title">{{ g.name }}</div>
                   <table class="param-table">
-                    <thead><tr><th>参数名</th><th>参数值</th></tr></thead>
+                    <thead><tr><th>参数名</th><th>参数值</th><th>单位</th></tr></thead>
                     <tbody>
                       <tr v-for="r in g.rows" :key="r.key">
-                        <td>{{ r.key }}<span v-if="r.label" style="color:var(--text-secondary)"> ({{ r.label }}{{ r.unit ? ', ' + r.unit : '' }})</span><span v-else-if="r.unit" style="color:var(--text-secondary)"> ({{ r.unit }})</span></td>
+                        <td>{{ r.key }}<span v-if="r.label" style="color:var(--text-secondary)"> ({{ r.label }})</span></td>
                         <td><input v-model="r.value" @blur="saveParamGroup(g)" @keydown.enter="saveParamGroup(g)" /></td>
+                        <td style="color:var(--text-secondary);font-size:12px">{{ r.unit || '-' }}</td>
                       </tr>
                     </tbody>
                   </table>
