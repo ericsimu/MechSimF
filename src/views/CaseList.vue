@@ -1003,7 +1003,7 @@ async function handleRunTask() {
 .tree-section-header:hover { background: #f5f7fa; }
 .section-active { background: var(--accent-light); }
 .tree-section-title { flex: 1; }
-.edit-right { flex:1; padding:16px 24px; overflow-y:auto; }
+.edit-right { flex:1; padding:16px 24px; overflow-y:auto; min-height:0; }
 .edit-right-empty { display:flex; align-items:center; justify-content:center; height:100%; color:#999; font-size:13px; }
 
 /* Model select panel */
