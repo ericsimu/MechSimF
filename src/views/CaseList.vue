@@ -68,7 +68,8 @@
           <div class="edit-body">
             <div class="edit-left" :style="{ width: leftPanelWidth + 'px' }">
               <div class="tree-section" :class="{ 'section-active': activeSection==='model' }">
-                <div class="tree-section-header" @click="activateSection('model')">
+                <div class="tree-section-header" @click="activeSection = activeSection === 'model' ? '' : 'model'">
+                  <span class="tree-section-arrow">{{ activeSection === 'model' ? '▼' : '▶' }}</span>
                   <span class="tree-section-title">模型选择</span>
                 </div>
               </div>
