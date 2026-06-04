@@ -135,14 +135,13 @@
                         @blur="e => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0 && v > 19.2) { editDraft.sim_time = 19.2; showToast('仿真时间不能超过 19.2s，已自动修正', 'error') } }" />
                     </div>
                   </div>
-                  <div v-if="editDraft.sys_name" class="model-image">
+                  <div v-if="editDraft.sys_name" style="width:100%;max-height:360px;margin-top:12px;border-radius:6px;border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa;">
                     <img :key="editDraft.sys_name" :src="`/api/v1/sim/model_image/${editDraft.sys_name}`"
                       :alt="editDraft.sys_name + ' model'"
-                      style="width:100%;min-height:120px;margin-top:12px;border-radius:6px;border:1px solid var(--border);object-fit:contain;display:block;"
+                      style="max-width:100%;max-height:360px;object-fit:contain;display:block;"
                       @error="e => { e.target.style.display='none'; imgFailed[editDraft.sys_name] = true }"
                       v-if="!imgFailed[editDraft.sys_name]" />
-                    <div v-else style="width:100%;min-height:120px;margin-top:12px;border-radius:6px;border:1px solid var(--border);
-                      display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">没有相关图片</div>
+                    <div v-else style="width:100%;height:160px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">没有相关图片</div>
                   </div>
                 </div>
               </template>

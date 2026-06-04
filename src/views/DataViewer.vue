@@ -20,8 +20,11 @@
             <div class="dv-signal-header">
               <span>信号列表 ({{ sigCols.length }})</span>
             </div>
+            <div style="padding:4px 8px">
+              <input type="text" v-model="searchText" placeholder="搜索信号..." style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;box-sizing:border-box" />
+            </div>
             <div class="dv-signal-list">
-              <label v-for="(c, i) in sigCols" :key="c.name" class="dv-signal-row">
+              <label v-for="(c, i) in filteredSigCols" :key="c.name" class="dv-signal-row">
                 <input type="checkbox" :checked="checked[c.name] === true" @change="toggleChecked(c.name)" />
                 <span class="dv-dot" :style="{ backgroundColor: COLORS[i % COLORS.length] }"></span>
                 <span class="dv-signal-name">{{ c.name }}</span>
@@ -60,6 +63,7 @@ const fftColumns = ref<DisturbanceColumn[]>([])
 const taskStatus = ref('')
 const taskError = ref('')
 const checked = ref<Record<string, boolean>>({})
+const searchText = ref('')
 
 // Zoom state: saved full-range data for reset
 const fullColumns = ref<DisturbanceColumn[] | null>(null)
@@ -139,6 +143,7 @@ const COLORS = [
 ]
 
 const sigCols = computed(() => columns.value.filter(c => c.name.toLowerCase() !== 'time'))
+const filteredSigCols = computed(() => sigCols.value.filter(c => c.name.toLowerCase().includes(searchText.value.toLowerCase())))
 
 // -- zoom-in detection via setSelect (fires during drag; capture range before uPlot clears it) --
 function makeSelectHandler(domain: 'time' | 'fft') {
