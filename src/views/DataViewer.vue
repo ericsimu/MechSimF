@@ -88,7 +88,13 @@ function fmtNum(v: number): string {
   return s.includes('.') ? s.replace(/\.?0+$/, '') : s
 }
 
-function makeCursorLabels(container: HTMLElement, xUnit: string) {
+function fmtSci(v: number): string {
+  if (!isFinite(v)) return String(v)
+  if (v === 0) return '0'
+  return v.toExponential(4)
+}
+
+function makeCursorLabels(container: HTMLElement, xUnit: string, yFmt: (v: number) => string = fmtNum) {
   const labels: HTMLDivElement[] = []
   function removeAll() { labels.forEach(l => l.remove()); labels.length = 0 }
   container.addEventListener('mouseleave', removeAll)
@@ -112,7 +118,7 @@ function makeCursorLabels(container: HTMLElement, xUnit: string) {
           const ty = u.valToPos(y, 'y')
           const d = document.createElement('div')
           d.style.cssText = `position:absolute;left:${ly+6}px;top:${ty-14}px;font-size:10px;color:#fff;background:rgba(0,0,0,0.78);padding:1px 5px;border-radius:2px;border-left:2px solid ${u.series[i].stroke||'#888'};pointer-events:none;white-space:nowrap;z-index:100;line-height:1.5;`
-          d.textContent = `${u.series[i].label||''}:${fmtNum(y)}`
+          d.textContent = `${u.series[i].label||''}:${yFmt(y)}`
           container.appendChild(d)
           labels.push(d)
         }
@@ -244,7 +250,7 @@ function buildTimeChart(): void {
   const timeLen = timeCol && timeCol.data.length > 0 ? timeCol.data.length : activeSigs[0].data.length
   const timeDataArr = timeCol && timeCol.data.length > 0 ? timeCol.data.map(v => v ?? 0) : activeSigs[0].data.map((_, i) => i)
   const w = el.offsetWidth || 800
-  timeLabels = makeCursorLabels(el, 's')
+  timeLabels = makeCursorLabels(el, 's', fmtSci)
 
   const series: Array<object> = [{}]
   const signalArrays: Array<Array<number | null>> = []
@@ -272,7 +278,7 @@ function buildTimeChart(): void {
       axes: [
         { label: timeCol ? 'Time (s)' : 'Index', grid: { stroke: '#e8e8e8' }, stroke: '#888',
           values: (self: any, ticks: number[]) => ticks.map(t => t.toFixed(2) + ' s') },
-        { stroke: '#888', grid: { stroke: '#e8e8e8' } },
+        { stroke: '#888', grid: { stroke: '#e8e8e8' }, values: (self: any, ticks: number[]) => ticks.map(t => fmtSci(t)) },
       ],
       series,
       hooks: {
