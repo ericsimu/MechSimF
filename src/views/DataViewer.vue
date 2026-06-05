@@ -32,16 +32,19 @@
               </label>
             </div>
           </div>
-          <div class="viz-right" ref="chartAreaRef">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
-              <button class="aurora-btn" @click="exportChartImage">导出图片</button>
-            </div>
+          <div class="viz-right">
             <div class="dv-chart-section">
-              <div class="dv-chart-title">时域图</div>
+              <div class="dv-chart-title">
+                时域图
+                <button class="aurora-btn" @click="exportChartSVG(timeChartRef, `task_${taskId}_time.svg`)">导出SVG</button>
+              </div>
               <div ref="timeChartRef" class="dv-chart"></div>
             </div>
             <div class="dv-chart-section">
-              <div class="dv-chart-title">频域图</div>
+              <div class="dv-chart-title">
+                频域图
+                <button class="aurora-btn" @click="exportChartSVG(freqChartRef, `task_${taskId}_freq.svg`)">导出SVG</button>
+              </div>
               <div ref="freqChartRef" class="dv-chart"></div>
             </div>
           </div>
@@ -56,7 +59,6 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getTaskDataColumns, getTaskSignals, getTaskStatus } from '../api/index'
 import type { DisturbanceColumn } from '../types/api'
-import html2canvas from 'html2canvas'
 import uPlot from '../lib/uplot/uPlot.esm.js'
 import '../lib/uplot/uPlot.min.css'
 const route = useRoute()
@@ -81,7 +83,6 @@ let freqBuildAt = 0
 
 const timeChartRef = ref<HTMLDivElement | null>(null)
 const freqChartRef = ref<HTMLDivElement | null>(null)
-const chartAreaRef = ref<HTMLDivElement | null>(null)
 let timeInst: any = null
 let freqInst: any = null
 let timeLabels: { hook(u:any):void, clear():void } | null = null
@@ -427,15 +428,21 @@ function toggleAllOff(): void {
   checked.value = {}
 }
 
-async function exportChartImage(): Promise<void> {
-  if (!chartAreaRef.value) return
-  try {
-    const canvas = await html2canvas(chartAreaRef.value, { backgroundColor: '#fff', scale: 2 })
-    const link = document.createElement('a')
-    link.download = `task_${taskId.value}_charts.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-  } catch { /* ignore */ }
+function exportChartSVG(container: HTMLDivElement | null, filename: string): void {
+  if (!container) return
+  const canvas = container.querySelector('canvas')
+  if (!canvas) return
+  const dataUrl = canvas.toDataURL('image/png')
+  const w = canvas.width
+  const h = canvas.height
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><image href="${dataUrl}" width="${w}" height="${h}"/></svg>`
+  const blob = new Blob([svg], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.download = filename
+  link.href = url
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 
@@ -529,7 +536,7 @@ onUnmounted(() => {
 .dv-signal-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .dv-chart-section { display: flex; flex-direction: column; }
-.dv-chart-title { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 2px; }
+.dv-chart-title { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
 .dv-chart { min-height: 300px; min-width: 100%; position: relative; }
 .dv-chart .u-legend {
   position: absolute; top: 4px; right: 8px; z-index: 10;
