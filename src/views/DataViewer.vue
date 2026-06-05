@@ -440,7 +440,7 @@ function exportChartSVG(container: HTMLDivElement | null, defaultName: string): 
   const ch = canvas.height
   // Extract legend items from uPlot legend
   let legendSvg = ''
-  const legendRows = container.querySelectorAll('.u-legend table tr')
+  const legendRows = container.querySelectorAll('.u-legend .u-series')
   if (legendRows.length > 0) {
     const itemH = 18
     const legendH = legendRows.length * itemH + 8
