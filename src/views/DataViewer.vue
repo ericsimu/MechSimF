@@ -19,6 +19,7 @@
           <div class="viz-left">
             <div class="dv-signal-header">
               <span>信号列表 ({{ sigCols.length }})</span>
+              <button class="aurora-btn" @click="toggleAllOff">全不选</button>
             </div>
             <div style="padding:4px 8px">
               <input type="text" v-model="searchText" placeholder="搜索信号..." style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;box-sizing:border-box" />
@@ -415,6 +416,10 @@ function toggleChecked(name: string): void {
     fetchSignals([name], 'time')
     fetchSignals([name], 'fft')
   }
+}
+
+function toggleAllOff(): void {
+  checked.value = {}
 }
 
 
