@@ -32,7 +32,10 @@
               </label>
             </div>
           </div>
-          <div class="viz-right">
+          <div class="viz-right" ref="chartAreaRef">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+              <button class="aurora-btn" @click="exportChartImage">导出图片</button>
+            </div>
             <div class="dv-chart-section">
               <div class="dv-chart-title">时域图</div>
               <div ref="timeChartRef" class="dv-chart"></div>
@@ -53,6 +56,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getTaskDataColumns, getTaskSignals, getTaskStatus } from '../api/index'
 import type { DisturbanceColumn } from '../types/api'
+import html2canvas from 'html2canvas'
 import uPlot from '../lib/uplot/uPlot.esm.js'
 import '../lib/uplot/uPlot.min.css'
 const route = useRoute()
@@ -77,6 +81,7 @@ let freqBuildAt = 0
 
 const timeChartRef = ref<HTMLDivElement | null>(null)
 const freqChartRef = ref<HTMLDivElement | null>(null)
+const chartAreaRef = ref<HTMLDivElement | null>(null)
 let timeInst: any = null
 let freqInst: any = null
 let timeLabels: { hook(u:any):void, clear():void } | null = null
@@ -420,6 +425,17 @@ function toggleChecked(name: string): void {
 
 function toggleAllOff(): void {
   checked.value = {}
+}
+
+async function exportChartImage(): Promise<void> {
+  if (!chartAreaRef.value) return
+  try {
+    const canvas = await html2canvas(chartAreaRef.value, { backgroundColor: '#fff', scale: 2 })
+    const link = document.createElement('a')
+    link.download = `task_${taskId.value}_charts.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  } catch { /* ignore */ }
 }
 
 
