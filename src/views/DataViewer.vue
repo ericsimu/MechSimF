@@ -367,16 +367,18 @@ function buildFreqChart(): void {
 
 async function fetchSignals(names: string[], domain: 'time' | 'fft', start?: number, end?: number): Promise<void> {
   const target = domain === 'fft' ? fftColumns : columns
-  let hasRange = start != null && end != null
+  let rangeStart = start
+  let rangeEnd = end
+  let hasRange = rangeStart != null && rangeEnd != null
 
   // When zoomed in time domain and no explicit range, auto-use current zoom window
   if (!hasRange && domain === 'time' && isTimeZoomed.value) {
     const timeCol = target.value.find(c => c.name.toLowerCase() === 'time')
     if (timeCol && timeCol.data.length > 0) {
       const d = timeCol.data
-      start = d[0] ?? undefined
-      end = d[d.length - 1] ?? undefined
-      hasRange = start != null && end != null
+      rangeStart = d[0] ?? undefined
+      rangeEnd = d[d.length - 1] ?? undefined
+      hasRange = rangeStart != null && rangeEnd != null
     }
   }
 
@@ -398,10 +400,10 @@ async function fetchSignals(names: string[], domain: 'time' | 'fft', start?: num
   }
 
   // Downsample full-range data for speed; use raw for zoomed sub-second views
-  const raw = domain === 'fft' || (hasRange && (end! - start!) < 1.0)
+  const raw = domain === 'fft' || (hasRange && (rangeEnd! - rangeStart!) < 1.0)
 
   try {
-    const r = await getTaskSignals(taskId.value, toFetch, domain, start, end, raw)
+    const r = await getTaskSignals(taskId.value, toFetch, domain, rangeStart, rangeEnd, raw)
     if (r.success && r.data) {
       for (const sc of r.data.columns) {
         // Never replace the x-axis column with data from an unrequested signal.
