@@ -270,8 +270,8 @@ import {
 import { AuroraButton } from '@aurora-design/vue'
 import Modal from '../components/Modal.vue'
 import TreeSection from '../components/TreeSection.vue'
-import uPlot from '../lib/uplot/uPlot.esm.js'
-import '../lib/uplot/uPlot.min.css'
+import uPlot from 'uplot'
+import 'uplot/dist/uPlot.min.css'
 
 // ═══════ Constants ═══════
 const PRODUCTIVITY_OPTIONS = ['100WPH', '150WPH']
