@@ -270,7 +270,7 @@ import {
 import { AuroraButton } from '@aurora-design/vue'
 import Modal from '../components/Modal.vue'
 import TreeSection from '../components/TreeSection.vue'
-import uPlot from 'uplot'
+import uPlot from 'uplot/dist/uPlot.esm.js'
 import 'uplot/dist/uPlot.min.css'
 
 // ═══════ Constants ═══════

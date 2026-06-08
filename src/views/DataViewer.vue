@@ -59,7 +59,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getTaskDataColumns, getTaskSignals, getTaskStatus } from '../api/index'
 import type { DisturbanceColumn } from '../types/api'
-import uPlot from 'uplot'
+import uPlot from 'uplot/dist/uPlot.esm.js'
 import 'uplot/dist/uPlot.min.css'
 const route = useRoute()
 const taskId = computed(() => Number(route.params.taskId) || 0)
